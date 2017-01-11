@@ -1,2 +1,0 @@
-# vipsplugins
-vipplugin
