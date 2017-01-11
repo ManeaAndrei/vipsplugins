@@ -1,0 +1,59 @@
+#include <amxmodx>
+#include < amxmisc >
+
+const TASK_ID = 258;
+
+new h;
+new task_set = 0;
+
+public plugin_init()
+{
+      register_plugin("VIP Hour", "1.0", "compaq")
+}
+
+public client_putinserver(id)
+{
+      new o, m, s;
+      time(o, m, s)
+      if((o >= 00 && o < 08) || (o >= 15 && o < 16))
+      {
+            if( get_user_flags(id) != read_flags("bit") || !( get_user_flags( id ) & ADMIN_LEVEL_H ) )
+            {
+               set_user_flags(id, read_flags("bit"))
+               set_task(3.0, "mesaj", id)
+             }
+
+            if( !task_set )
+            {
+               set_task( 60.0, "recheck", TASK_ID, _, _, "b" ); // task pus la 1 minut pentru a functiona corect
+               task_set = 1;
+            }
+      }
+}
+
+public recheck()
+{
+
+   time( h, _, _ );
+
+   if( h >= 08 || h >= 16 )
+   {
+      new iPlayers[ 32 ], iNum, i;
+      get_players( iPlayers, iNum );
+      
+      for( i = 0; i < iNum; i++ )
+      {
+         remove_user_flags( iPlayers[ i ] );
+      }
+
+      server_cmd( "amx_reloadadmins" );
+
+      remove_task( TASK_ID );
+      task_set = 0;
+   }
+}
+
+public mesaj(id)
+{
+      client_print(id, print_chat, Mesaj")
+}
